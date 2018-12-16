@@ -13,6 +13,7 @@ function loadScript(url) {
 
 class App extends Component {
   componentDidMount() {
+    this.getVenues();
     this.renderMap();
   }
 
@@ -22,16 +23,17 @@ class App extends Component {
   }
 
   getVenues = () => {
-    const endPoint = 'https://api.foursquare.com/v2/venues/explore';
+    const endPoint = 'https://api.foursquare.com/v2/venues/explore?';
     const parameters = {
       client_id: process.env.REACT_APP_CLIENT_ID,
       client_secret: process.env.REACT_APP_CLIENT_SECRET,
       query: 'coffee',
       near: 'London',
+      v: 20182507,
     };
 
     axios.get(endPoint + new URLSearchParams(parameters))
-      .then(response => console.log(response))
+      .then(response => console.log(response.data.response.groups[0].items))
       .catch(error => console.log(error));
   }
 
