@@ -57,14 +57,26 @@ class App extends Component {
       zoom: 15,
     });
 
+    const infowindow = new window.google.maps.InfoWindow();
+
     const { venues } = this.state;
-    venues.map(myVenue => new window.google.maps.Marker({
-      position: {
-        lat: myVenue.venue.location.lat,
-        lng: myVenue.venue.location.lng,
-      },
-      map: myMap,
-    }));
+
+    venues.forEach((myVenue) => {
+      const contentString = `${myVenue.venue.name}`;
+
+      const marker = new window.google.maps.Marker({
+        position: {
+          lat: myVenue.venue.location.lat,
+          lng: myVenue.venue.location.lng,
+        },
+        map: myMap,
+      });
+
+      marker.addListener('click', () => {
+        infowindow.setContent(contentString);
+        infowindow.open(myMap, marker);
+      });
+    });
   }
 
   render() {
