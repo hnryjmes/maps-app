@@ -2,19 +2,22 @@ import React, { Component } from 'react';
 import './App.css';
 import axios from 'axios';
 
-function loadScript(url) {
+const loadScript = (url) => {
   const index = window.document.getElementsByTagName('script')[0];
   const script = window.document.createElement('script');
   script.src = url;
   script.async = true;
   script.defer = true;
   index.parentNode.insertBefore(script, index);
-}
+};
 
 class App extends Component {
+  state = {
+    venues: [],
+  }
+
   componentDidMount() {
     this.getVenues();
-    this.renderMap();
   }
 
   renderMap = () => {
@@ -33,16 +36,35 @@ class App extends Component {
     };
 
     axios.get(endPoint + new URLSearchParams(parameters))
-      .then(response => console.log(response.data.response.groups[0].items))
-      .catch(error => console.log(error));
+      .then((response) => {
+        this.setState({
+          venues: response.data.response.groups[0].items,
+        }, this.renderMap());
+      })
+      .catch((error) => {
+        throw Error(error);
+      });
   }
 
   initMap = () => {
-    const map = new window.google.maps.Map(document.getElementById('map'), {
-      center: { lat: 51.517352, lng: -0.073267 },
+    const MAKERS_ACADEMY_POSITION = {
+      lat: 51.517352,
+      lng: -0.073267,
+    };
+
+    const myMap = new window.google.maps.Map(document.getElementById('map'), {
+      center: { lat: MAKERS_ACADEMY_POSITION.lat, lng: MAKERS_ACADEMY_POSITION.lng },
       zoom: 15,
     });
-    console.log(map);
+
+    const { venues } = this.state;
+    venues.map(myVenue => new window.google.maps.Marker({
+      position: {
+        lat: myVenue.venue.location.lat,
+        lng: myVenue.venue.location.lng,
+      },
+      map: myMap,
+    }));
   }
 
   render() {
